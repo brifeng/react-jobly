@@ -1,24 +1,28 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const LoginForm = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
+const LoginForm = ({ login }) => {
+    const [formData, setFormData] = useState({
+        username: "testusername",
+        password: "testpassword"
+    });
+    const navigate = useNavigate();
 
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value);
-    };
+    function handleChange(event) {
+        const { name, value } = event.target;
+        setFormData(data => ({ ...data, [name]: value }));
+    }
 
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    };
-
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (username === 'myusername' && password === 'mypassword') {
-            setMessage('Login successful!');
-        } else {
-            setMessage('Invalid username or password');
+        try {
+            const res = await login(formData);
+            if (res.success) {
+                navigate("/companies");
+            }
+            else { }
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -27,17 +31,22 @@ const LoginForm = () => {
             <form onSubmit={handleSubmit}>
                 <label>
                     Username:
-                    <input type="text" value={username} onChange={handleUsernameChange} />
+                    <input type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange} />
                 </label>
                 <br />
                 <label>
                     Password:
-                    <input type="password" value={password} onChange={handlePasswordChange} />
+                    <input type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange} />
                 </label>
                 <br />
                 <input type="submit" value="Submit" />
             </form>
-            <p>{message}</p>
         </div>
     );
 }
